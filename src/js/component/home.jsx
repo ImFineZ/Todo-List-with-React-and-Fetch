@@ -3,24 +3,49 @@ import React, { useState, useEffect } from "react";
 
 //create your first component
 const Home = () => {
-	/* const { todos, setTodod } = useState(null); */
-	const [addTarea, setAddTarea] = useState([]);
+	
+	const [addTarea, setAddTarea] = useState([""]);
 
+	//Metodo get
 	const getTareas = () => {
-		fetch("https://assets.breatheco.de/apis/fake/todos/user/ronaldazofeifa")
+		fetch("https://assets.breatheco.de/apis/fake/todos/user/GreivinRodriguez")
 			.then((resp) => resp.json())
-			.then((data) => console.log(data));
+			.then((data) => setAddTarea(data))
 	};
 	useEffect(() => {
 		getTareas();
 	}, []);
 
-	function listaTareas(e) {
+	//Metodo Put
+	let myHeaders = new Headers();
+	myHeaders.append("Content-Type", "application/json");
+
+	let cadenaTexto = JSON.stringify(addTarea);
+	let Estructura = {
+		method: "PUT",
+		headers: myHeaders,
+		body: cadenaTexto,
+		redirect: "follow"
+	};
+
+	fetch(
+		"https://assets.breatheco.de/apis/fake/todos/user/GreivinRodriguez",
+		Estructura
+	)
+		.then(response => response.text())
+		.then(result => console.log(result))
+
+
+	const listaTareas = (e) => {
 		if (e.key === "Enter") {
-			setAddTarea([...addTarea, e.target.value]);
+			setAddTarea([
+				{ label: e.target.value, done: false },
+				...addTarea
+			]);
+			console.log(addTarea);
 			e.target.value = "";
 		}
-	}
+	};
 	console.log(addTarea);
 
 	const RemoveTodo = index => {
@@ -28,13 +53,6 @@ const Home = () => {
 		newTodos.splice(index, 1);
 		setAddTarea(newTodos);
 	};
-
-	/* 	let tareaPendientes = "";
-		if (addTarea.length == 0) {
-			tareaPendientes = "No hay tarea pendientes "
-		} else {
-			tareaPendientes = "Tarea pendientes = ";
-		} */
 
 	return (
 		<div className="contenedor">
@@ -54,23 +72,24 @@ const Home = () => {
 					<div className="list-group col-4 mx-auto d-flex justify-content-between">
 						<div>
 							<ul>
-								{addTarea.map((tarea, index) => (
-									<li key={index}>
-										{tarea}
-										<a
-											className="float-end"
-											onClick={() => RemoveTodo(index)}>
-											<i className="bi bi-x bg-primary text-white"></i>
-										</a>
-									</li>
-								))}
+								{addTarea.map((tarea, index) => {
+									return (
+										<li key={index}>
+											{tarea.label}
+											<a
+												className="float-end"
+												onClick={() => RemoveTodo(index)}>
+												<i className="bi bi-x bg-primary text-white"></i>
+											</a>
+										</li>
+									)
+								})}
 							</ul>
 						</div>
 					</div>
 				</div>
 				<div>
-					{/* <h4 className="text-center">{tareaPendientes}{addTarea.length}</h4> */}
-					<h4 className="text-center">{addTarea.length ? `Tarea pendientes ${addTarea.length}.` : `No hay tarea pendientes`}</h4>
+					<h4 className="text-center">{addTarea.length ? `Tarea pendientes ${addTarea.length}` : `No hay tarea pendientes`}</h4>
 				</div>
 			</div>
 		</div>
